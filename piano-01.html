@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>音名與唱名對應</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+      background-color: #f0f8ff;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    label {
+      font-weight: bold;
+      color: #333;
+    }
+    .keyboard {
+      position: relative;
+      width: fit-content;
+      margin: 20px auto;
+    }
+    .white-keys {
+      display: flex;
+      position: relative;
+      z-index: 1;
+    }
+    .black-key {
+      position: absolute;
+      width: 25px;
+      height: 100px;
+      background: black;
+      border: 1px solid #333;
+      z-index: 3;
+      cursor: pointer;
+      top: 0;
+      border-radius: 0 0 3px 3px;
+    }
+    .key.white {
+      width: 40px;
+      height: 150px;
+      background: #ffffff;
+      border: 1px solid #000000;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+      cursor: pointer;
+      color: #00008b;
+      font-weight: bold;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 5px;
+    }
+    .output {
+      font-size: 1.3em;
+      margin-top: 20px;
+      color: #2c3e50;
+    }
+    .hint {
+      margin-top: 10px;
+      font-style: italic;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>音名與唱名對應教學</h1>
+
+  <label for="key">選擇調性（大調）：</label>
+  <select id="key">
+    <option value="C">C 大調</option>
+    <option value="D">D 大調</option>
+    <option value="E">E 大調</option>
+    <option value="F">F 大調</option>
+    <option value="G">G 大調</option>
+    <option value="A">A 大調</option>
+    <option value="B">B 大調</option>
+  </select>
+
+  <div class="hint">點選畫面上的琴鍵，顯示音名與該調性下的唱名</div>
+
+  <div class="keyboard" id="keyboard">
+    <div class="white-keys" id="white-keys">
+      <div class="key white" data-note="C">C</div>
+      <div class="key white" data-note="D">D</div>
+      <div class="key white" data-note="E">E</div>
+      <div class="key white" data-note="F">F</div>
+      <div class="key white" data-note="G">G</div>
+      <div class="key white" data-note="A">A</div>
+      <div class="key white" data-note="B">B</div>
+    </div>
+    <div id="black-keys"></div>
+  </div>
+
+  <div class="output" id="output">請點選一個琴鍵</div>
+
+  <script>
+    const majorScaleMap = {
+      'C': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+      'D': ['D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#'],
+      'E': ['E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#'],
+      'F': ['F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E'],
+      'G': ['G', 'G#', 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#'],
+      'A': ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'],
+      'B': ['B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#']
+    };
+
+    const solfege12 = ['Do', 'Di', 'Re', 'Ri', 'Mi', 'Fa', 'Fi', 'Sol', 'Si', 'La', 'Li', 'Ti'];
+
+    const whiteKeyNotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    const blackKeyOffsets = {
+      'C#': 30,
+      'D#': 70,
+      'F#': 150,
+      'G#': 190,
+      'A#': 230
+    };
+
+    const blackKeyOrder = ['C#', 'D#', 'F#', 'G#', 'A#'];
+
+    const blackKeyContainer = document.getElementById('black-keys');
+    blackKeyOrder.forEach(note => {
+      const key = document.createElement('div');
+      key.classList.add('black-key');
+      key.dataset.note = note;
+      key.style.left = `${blackKeyOffsets[note]}px`;
+      blackKeyContainer.appendChild(key);
+    });
+
+    const keys = document.querySelectorAll('.key.white, .black-key');
+    const output = document.getElementById('output');
+    const keySelector = document.getElementById('key');
+
+    keys.forEach(key => {
+      key.addEventListener('click', () => {
+        const selectedKey = keySelector.value;
+        const note = key.dataset.note;
+        const scale = majorScaleMap[selectedKey];
+        const index = scale.findIndex(n => n === note);
+
+        if (index !== -1) {
+          output.textContent = `音名：${note}，唱名：${solfege12[index]}`;
+        } else {
+          output.textContent = `音名：${note}，不在 ${selectedKey} 大調內`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
